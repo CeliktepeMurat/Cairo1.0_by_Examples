@@ -18,13 +18,13 @@ mod ERC20 {
     fn Approval(owner: felt, spender: felt, amount: u256) {}
 
     #[constructor]
-    fn constructor(_name: felt, _symbol: felt, _decimals: u8, init_supply: u256, recepient: felt) {
+    fn constructor(_name: felt, _symbol: felt, _decimals: u8, init_supply: u256, recipient: felt) {
         name::write(_name);
         symbol::write(_symbol);
         decimals::write(_decimals);
         total_supply::write(init_supply);
-        balances::write(recepient, init_supply);
-        Transfer(0, recepient, init_supply);
+        balances::write(recipient, init_supply);
+        Transfer(0, recipient, init_supply);
     }
 
     #[view]
@@ -53,21 +53,21 @@ mod ERC20 {
     }
 
     #[view]
-    fn get_allowance(owner: felt, spender: felt) -> felt {
+    fn get_allowance(owner: felt, spender: felt) -> u256 {
         allowances::read((owner, spender))
     }
 
     #[external]
-    fn transfer(recepient: felt, amount: u256) {
+    fn transfer(recipient: felt, amount: u256) {
         let sender = get_caller_address();
-        _transfer(sender, recepient, amount);
+        _transfer(sender, recipient, amount);
     }
 
     #[external]
-    fn transferFrom(owner: felt, recepient: felt, amount: u256) {
+    fn transferFrom(owner: felt, recipient: felt, amount: u256) {
         let caller = get_caller_address();
         _spend_allowance(owner, caller, amount);
-        _transfer(owner, recepient, amount);
+        _transfer(owner, recipient, amount);
     }
 
     #[external]
@@ -97,25 +97,25 @@ mod ERC20 {
 
     #[internal]
     fn _approve(owner: felt, spender: felt, amount: u256) {
-        assert(owner != 0, 'ERC20: approve from the zero address');
-        assert(spender != 0, 'ERC20: approve to the zero address');
+        assert(owner != 0, 'ERC20: approve from 0');
+        assert(spender != 0, 'ERC20: approve to 0');
 
         allowances::write((owner, spender), amount);
         Approval(owner, spender, amount);
     }
 
     #[internal]
-    fn _transfer(sender: felt, recepient: felt, amount: u256) {
-        assert(sender != 0, 'ERC20: transfer from the zero address');
-        assert(recepient != 0, 'ERC20: transfer to the zero address');
+    fn _transfer(sender: felt, recipient: felt, amount: u256) {
+        assert(sender != 0, 'ERC20: transfer from 0');
+        assert(recipient != 0, 'ERC20: transfer to 0');
 
         let sender_balance = balances::read(sender);
-        assert(sender_balance >= amount, 'ERC20: transfer amount exceeds balance');
+        assert(sender_balance > amount, 'ERC20: exceeds sender balance');
 
-        let recepient_balance = balances::read(recepient);
+        let recipient_balance = balances::read(recipient);
 
         balances::write(sender, sender_balance - amount);
-        balances::write(recepient, recepient_balance + amount);
-        Transfer(sender, recepient, amount);
+        balances::write(recipient, recipient_balance + amount);
+        Transfer(sender, recipient, amount);
     }
 }
