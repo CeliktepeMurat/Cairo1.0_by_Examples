@@ -23,6 +23,6 @@ mod HelloStarknet {
 
     #[view]
     fn read_Balance() -> felt {
-        balance::read();
+        balance::read()
     }
 }
