@@ -2,24 +2,24 @@
 
 install:
 
-    - git submodule init && git submodule update
+    git submodule init && git submodule update
 
 update:
 
-    - git submodule update
+    git submodule update
 
 build:
 
-    - cargo build
+    cargo build
 
 test:
 
-    -cargo run --bin cairo-test -- --starknet --path $(SOURCE_FOLDER)
+    cargo run --bin cairo-test -- --starknet --path $(SOURCE_FOLDER)
 
 format:
 
-    -cargo run --bin cairo-format -- --recursive $(SOURCE_FOLDER) --print-parsing-errors
+    cargo run --bin cairo-format -- --recursive $(SOURCE_FOLDER) --print-parsing-errors
 
 check-format:
 
-    -cargo run --bin cairo-format -- --check --recursive $(SOURCE_FOLDER)
+    cargo run --bin cairo-format -- --check --recursive $(SOURCE_FOLDER)
