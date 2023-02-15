@@ -27,3 +27,7 @@ format:
 check-format:
 
     cargo run --bin cairo-format -- --check --recursive $(SOURCE_FOLDER)
+
+## TTroubleshooting 
+- Error: 
+append this one to your command line -> ``` --allowed-libfuncs-list-name experimental_v0.1.0 ```
