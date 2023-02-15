@@ -29,5 +29,5 @@ check-format:
     cargo run --bin cairo-format -- --check --recursive $(SOURCE_FOLDER)
 
 ## Troubleshooting 
-- Error: 
-append this one to your command line -> ``` --allowed-libfuncs-list-name experimental_v0.1.0 ```
+- Error: Libfunc alloc_local is not allowed in the libfuncs list 'audited_v0.1.0'.
+    - Fix: append this one to your command line -> ``` --allowed-libfuncs-list-name experimental_v0.1.0 ```
