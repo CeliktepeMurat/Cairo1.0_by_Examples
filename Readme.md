@@ -12,6 +12,10 @@ build:
 
     cargo build
 
+install Language Server
+
+    cargo build --bin cairo-language-server --release
+
 test:
 
     cargo run --bin cairo-test -- --starknet --path $(SOURCE_FOLDER)
