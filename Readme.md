@@ -1,4 +1,4 @@
-# Cairo 1.0 Boilerplate
+# Cairo 1.0 Examples
 
 install:
 
