@@ -159,5 +159,22 @@ mod ERC721 {
     }
 }
 
+
+use ERC721::IERC721;
+use zeroable::Zeroable;
+use starknet::get_caller_address;
+use starknet::ContractAddressZeroable;
+use starknet::ContractAddressIntoFelt;
+use starknet::contract_address_const;
+use starknet::FeltTryIntoContractAddress;
+use traits::TryInto;
+use traits::Into;
+use option::OptionTrait;
+
 #[test]
 #[available_gas(200000)]
+fn ERC721_Test_Suite() {
+    ERC721::constructor('Test', 'TST');
+    assert(IERC721::get_name() == 'Test', 'wrong name');
+    assert(IERC721::get_symbol() == 'TST', 'wrong symbol');
+}
