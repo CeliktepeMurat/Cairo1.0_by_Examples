@@ -35,6 +35,8 @@ mod ERC721 {
         fn balance_of(address: ContractAddress) -> felt;
         fn owner_of(token_id: u256) -> felt;
         fn get_approved(token_id: u256) -> felt;
+        fn get_name() -> felt;
+        fn get_symbol() -> felt;
         fn mint(to: ContractAddress, token_id: u256);
         fn burn(token_id: u256);
         fn approve(to: ContractAddress, token_id: u256);
@@ -43,10 +45,24 @@ mod ERC721 {
         fn _mint(to: ContractAddress, token_id: u256);
         fn isApprovedOrOwner(owner: ContractAddress, spender: ContractAddress, token_id: u256) -> bool;
         fn _burn(token_id: u256);
-       
+    }
+
+    #[constructor]
+    fn constructor(_name: felt, _symbol: felt) {
+        name::write(_name);
+        symbol::write(_symbol);
     }
 
     impl ERC721_Impl of IERC721 {
+        #[view]
+        fn get_name() -> felt {
+            name::read()
+        }
+
+        #[view]
+        fn get_symbol() -> felt {
+            symbol::read()
+        }
         
         #[view]
         fn balance_of(address: ContractAddress) -> felt {
@@ -142,3 +158,6 @@ mod ERC721 {
         }
     }
 }
+
+#[test]
+#[available_gas(200000)]
