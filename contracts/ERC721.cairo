@@ -174,7 +174,7 @@ use integer::FeltIntoU256;
 
 #[test]
 #[available_gas(500000)]
-fn ERC721_Test_Suite() {
+fn init_ERC721() {
     ERC721::constructor('Test', 'TST');
     assert(IERC721::get_name() == 'Test', 'wrong name');
     assert(IERC721::get_symbol() == 'TST', 'wrong symbol');
