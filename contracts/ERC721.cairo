@@ -128,7 +128,7 @@ mod ERC721 {
         #[internal]
         fn _mint(to: ContractAddress, token_id: u256) {
             assert(!to.is_zero(), 'ERC721: to is Zero');
-            assert(!_ownerOf::read(token_id).is_zero(), 'ERC721: token already exists');
+            assert(_ownerOf::read(token_id).is_zero(), 'ERC721: token already exists');
 
             _balanceOf::write(to, _balanceOf::read(to) + 1);
             _ownerOf::write(token_id, to.into());
@@ -164,17 +164,28 @@ use ERC721::IERC721;
 use zeroable::Zeroable;
 use starknet::get_caller_address;
 use starknet::ContractAddressZeroable;
+use starknet::FeltTryIntoContractAddress;
 use starknet::ContractAddressIntoFelt;
 use starknet::contract_address_const;
-use starknet::FeltTryIntoContractAddress;
 use traits::TryInto;
 use traits::Into;
 use option::OptionTrait;
+use integer::FeltIntoU256;
 
 #[test]
-#[available_gas(200000)]
+#[available_gas(300000)]
 fn ERC721_Test_Suite() {
     ERC721::constructor('Test', 'TST');
     assert(IERC721::get_name() == 'Test', 'wrong name');
     assert(IERC721::get_symbol() == 'TST', 'wrong symbol');
+
+    let user = FeltTryIntoContractAddress::try_into('user').unwrap();
+    assert(IERC721::balance_of(user) == 0, 'wrong balance');
+
+    // test mint
+    let token_id = FeltIntoU256::into(1);
+    IERC721::mint(user, token_id);
+    assert(IERC721::balance_of(user) == 1, 'wrong balance');
+    assert(IERC721::owner_of(token_id) == user.into(), 'wrong owner');
 }
+
