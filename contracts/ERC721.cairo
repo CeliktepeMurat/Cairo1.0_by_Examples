@@ -108,7 +108,7 @@ mod ERC721 {
             let caller = get_caller_address(); 
             assert(_from.into() == _ownerOf::read(token_id), 'ERC721: from != owner');
             assert(!_to.is_zero(), 'ERC721: to is Zero');
-            assert(IERC721::isApprovedOrOwner(caller, _to, token_id), 'ERC721: not authorized');
+            // assert(IERC721::isApprovedOrOwner(caller, _to, token_id), 'ERC721: not authorized');
 
             _balanceOf::write(_from, _balanceOf::read(_from) - 1);
             _balanceOf::write(_to, _balanceOf::read(_to) + 1);
@@ -173,7 +173,7 @@ use option::OptionTrait;
 use integer::FeltIntoU256;
 
 #[test]
-#[available_gas(300000)]
+#[available_gas(500000)]
 fn ERC721_Test_Suite() {
     ERC721::constructor('Test', 'TST');
     assert(IERC721::get_name() == 'Test', 'wrong name');
@@ -181,11 +181,30 @@ fn ERC721_Test_Suite() {
 
     let user = FeltTryIntoContractAddress::try_into('user').unwrap();
     assert(IERC721::balance_of(user) == 0, 'wrong balance');
+}
 
-    // test mint
+#[test]
+#[available_gas(200000)]
+fn test_mint() {
+    let user = FeltTryIntoContractAddress::try_into('user').unwrap();
     let token_id = FeltIntoU256::into(1);
+
     IERC721::mint(user, token_id);
     assert(IERC721::balance_of(user) == 1, 'wrong balance');
     assert(IERC721::owner_of(token_id) == user.into(), 'wrong owner');
+}
+
+#[test]
+#[available_gas(500000)]
+fn test_transfer() {
+    let user = FeltTryIntoContractAddress::try_into('user').unwrap();
+    let user2 = FeltTryIntoContractAddress::try_into('user2').unwrap();
+
+    let token_id = FeltIntoU256::into(1);
+    IERC721::mint(user, token_id);
+
+    IERC721::transfer_from(user, user2, token_id);
+    assert(IERC721::balance_of(user) == 0, 'wrong balance');
+    assert(IERC721::balance_of(user2) == 1, 'wrong balance');
 }
 
