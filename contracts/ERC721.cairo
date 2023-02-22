@@ -35,12 +35,13 @@ mod ERC721 {
         fn balance_of(address: ContractAddress) -> felt;
         fn owner_of(token_id: u256) -> felt;
         fn get_approved(token_id: u256) -> felt;
-        fn isApprovedOrOwner(owner: ContractAddress, spender: ContractAddress, token_id: u256) -> bool;
         fn mint(to: ContractAddress, token_id: u256);
+        fn burn(token_id: u256);
         fn approve(to: ContractAddress, token_id: u256);
         fn transfer_from(_from: ContractAddress, _to: ContractAddress, token_id: u256);
         fn setApprovalForAll(operator: ContractAddress, approved: bool);
         fn _mint(to: ContractAddress, token_id: u256);
+        fn isApprovedOrOwner(owner: ContractAddress, spender: ContractAddress, token_id: u256) -> bool;
         fn _burn(token_id: u256);
        
     }
@@ -65,13 +66,15 @@ mod ERC721 {
             _approvals::read(token_id)
         }
 
-       
-
         #[external]
         fn mint(to: ContractAddress, token_id: u256) {
-            let caller = get_caller_address();
-            assert(caller.into() == contract_address_const::<0>(), 'ERC721: not authorized');
-            _mint(to, token_id);
+            IERC721::_mint(to, token_id);
+        }
+
+        #[external]
+        fn burn(token_id: u256) {
+            assert(_ownerOf::read(token_id) == get_caller_address().into(), 'ERC721: not authorized');
+            IERC721::_burn(token_id);
         }
 
         #[external]
@@ -89,7 +92,7 @@ mod ERC721 {
             let caller = get_caller_address(); 
             assert(_from.into() == _ownerOf::read(token_id), 'ERC721: from != owner');
             assert(!_to.is_zero(), 'ERC721: to is Zero');
-            assert(isApprovedOrOwner(caller, _to, token_id), 'ERC721: not authorized');
+            assert(IERC721::isApprovedOrOwner(caller, _to, token_id), 'ERC721: not authorized');
 
             _balanceOf::write(_from, _balanceOf::read(_from) - 1);
             _balanceOf::write(_to, _balanceOf::read(_to) + 1);
@@ -106,6 +109,7 @@ mod ERC721 {
             ApprovalForAll(caller, operator, approved);
         }
 
+        #[internal]
         fn _mint(to: ContractAddress, token_id: u256) {
             assert(!to.is_zero(), 'ERC721: to is Zero');
             assert(!_ownerOf::read(token_id).is_zero(), 'ERC721: token already exists');
@@ -116,12 +120,14 @@ mod ERC721 {
             Transfer(contract_address_const::<0>(), to, token_id);
         }
 
+        #[internal]
         fn isApprovedOrOwner(owner: ContractAddress, spender: ContractAddress, token_id: u256) -> bool {
             spender.into() == owner.into() | 
                 isApprovedForAll::read((owner, spender)) |
                 spender.into() == _approvals::read(token_id)  
         }
 
+        #[internal]
         fn _burn(token_id: u256) {
             let owner_as_felt = _ownerOf::read(token_id);
             let owner = owner_as_felt.try_into().unwrap();
@@ -134,6 +140,5 @@ mod ERC721 {
 
             Transfer(owner, contract_address_const::<0>(), token_id);
         }
-  
     }
 }
